@@ -28,12 +28,16 @@ class Snake:
 
         self.dir = self.body[0]
 
-    def move(self, tile_type: type | None):
+    def move(self, tile_type: type | None, max_x, max_y):
         if not self.check_available(self.head + self.dir.value):
             return False
 
         self.head = self.head + self.dir.value
         self.body.insert(0, self.dir)
+
+        if (self.head.x < 0 or self.head.x > max_x
+                or self.head.y < 0 or self.head.y > max_y):
+            return False
 
         if tile_type is not GoodFruit:
             self.body.pop()

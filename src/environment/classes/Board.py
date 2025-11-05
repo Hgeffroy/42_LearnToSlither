@@ -1,9 +1,10 @@
 import random
+import pygame
 from pygame.math import Vector2
 
 from classes.Snake import Snake
 from classes.Fruit import GoodFruit, BadFruit
-from classes.utils import Directions
+from classes.utils import Directions as D
 
 
 class Board:
@@ -61,12 +62,29 @@ class Board:
         empty = empty and self.snake.check_available(pos)
 
         return empty
-    
-    def change_snake_direction(self, new_dir: Directions):
-        self.snake.dir = new_dir
+
+    def on_event_keypressed(self, event):
+        match event.key:
+            case pygame.K_UP:
+                new_dir = D.UP
+                if self.snake.dir != new_dir.opposite():
+                    self.snake.dir = new_dir
+            case pygame.K_DOWN:
+                new_dir = D.DOWN
+                if self.snake.dir != new_dir.opposite():
+                    self.snake.dir = new_dir
+            case pygame.K_LEFT:
+                new_dir = D.LEFT
+                if self.snake.dir != new_dir.opposite():
+                    self.snake.dir = new_dir
+            case pygame.K_RIGHT:
+                new_dir = D.RIGHT
+                if self.snake.dir != new_dir.opposite():
+                    self.snake.dir = new_dir
 
     def update(self):
         snake_next_pos = self.snake.head + self.snake.dir.value
+
         tile = None
         for f in self.good_fruits:
             if not f.check_available(snake_next_pos):
@@ -78,13 +96,15 @@ class Board:
                 tile = type(f)
                 self.bad_fruits.remove(f)
 
-        if not self.snake.move(tile):
-            pass  # Game over
+        if not self.snake.move(tile, self.ncolumns - 1, self.nrows - 1):
+            return False
 
         if tile is GoodFruit:
             self._generate_good_fruit()
         if tile is BadFruit:
             self._generate_bad_fruit()
+
+        return True
 
     def draw(self, display):
         for f in self.good_fruits:

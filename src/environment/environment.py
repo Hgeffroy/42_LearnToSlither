@@ -3,14 +3,13 @@ import sys
 from pygame.locals import QUIT
 
 from classes.Board import Board
-from classes.utils import Directions as D
 
 FPS = 60
 FramePerSec = pygame.time.Clock()
 
 # Screen information
 SCREEN_WIDTH = 400
-SCREEN_HEIGHT = 600
+SCREEN_HEIGHT = 400
 
 # Screen update event
 SCREEN_UPDATE = pygame.USEREVENT
@@ -21,7 +20,7 @@ def init_window():
 
     display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("LearnToSlither")
-    pygame.time.set_timer(SCREEN_UPDATE, 150)
+    pygame.time.set_timer(SCREEN_UPDATE, 300)
 
     board = Board()
 
@@ -35,21 +34,12 @@ def launch_game(display, board):
                 pygame.quit()
                 sys.exit()
             if event.type == SCREEN_UPDATE:
-                board.update()
+                if not board.update():
+                    print('Game Over')
+                    pygame.quit()
+                    sys.exit()
             if event.type == pygame.KEYDOWN:
-                match event.key:
-                    case pygame.K_UP:
-                        board.change_snake_direction(D.UP)
-                        break
-                    case pygame.K_DOWN:
-                        board.change_snake_direction(D.DOWN)
-                        break
-                    case pygame.K_LEFT:
-                        board.change_snake_direction(D.LEFT)
-                        break
-                    case pygame.K_RIGHT:
-                        board.change_snake_direction(D.RIGHT)
-                        break
+                board.on_event_keypressed(event)
 
         display.fill(pygame.Color('black'))
         board.draw(display)
