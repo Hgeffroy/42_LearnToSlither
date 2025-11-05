@@ -1,7 +1,9 @@
 import pygame
 from pygame.math import Vector2
-from classes.utils import Directions as D
 import random
+
+from classes.utils import Directions as D
+from classes.Fruit import GoodFruit, BadFruit
 
 
 class Snake:
@@ -26,14 +28,33 @@ class Snake:
 
         self.dir = self.body[0]
 
+    def move(self, tile_type: type | None):
+        if not self.check_available(self.head + self.dir.value):
+            return False
+
+        self.head = self.head + self.dir.value
+        self.body.insert(0, self.dir)
+
+        if tile_type is not GoodFruit:
+            self.body.pop()
+
+        if tile_type is BadFruit:
+            if len(self.body) == 0:
+                return False
+            self.body.pop()
+
+        return True
+
     def draw(self, display):
         pos_to_draw = self.head.copy()
         rect = pygame.Rect(pos_to_draw.x * self.cell_size,
                            pos_to_draw.y * self.cell_size,
                            self.cell_size, self.cell_size)
-        pygame.draw.rect(display, pygame.Color('yellow'), rect)
+        pygame.draw.rect(display, pygame.Color('orange'), rect)
+        i = 0
         for dir in self.body:
-            pos_to_draw += dir.value
+            i += 1
+            pos_to_draw += dir.opposite().value
             rect = pygame.Rect(pos_to_draw.x * self.cell_size,
                                pos_to_draw.y * self.cell_size,
                                self.cell_size, self.cell_size)
@@ -42,11 +63,13 @@ class Snake:
     def check_available(self, pos_to_check: Vector2):
         pos_snake = self.head.copy()
         if pos_snake == pos_to_check:
+            print('touching snake')
             return False
 
         for dir in self.body:
-            pos_snake += dir.value
+            pos_snake += dir.opposite().value
             if pos_snake == pos_to_check:
+                print('touching snake')
                 return False
 
         return True

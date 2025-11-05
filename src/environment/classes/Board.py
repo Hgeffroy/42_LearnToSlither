@@ -3,6 +3,7 @@ from pygame.math import Vector2
 
 from classes.Snake import Snake
 from classes.Fruit import GoodFruit, BadFruit
+from classes.utils import Directions
 
 
 class Board:
@@ -32,26 +33,58 @@ class Board:
             self._generate_good_fruit()
 
     def _generate_good_fruit(self):
-        # Verifier qu'il n'y a rien d'autre sur la case
         available = False
         while available is False:
             x = random.randint(0, self.ncolumns - 1)
             y = random.randint(0, self.nrows - 1)
             pos = Vector2(x, y)
-            available = True
-            for f in self.good_fruits:
-                available = available and f.check_available(pos)
-            for f in self.bad_fruits:
-                available = available and f.check_available(pos)
-            available = self.snake.check_available(pos)
+            available = self._check_tile_empty(pos)
 
         self.good_fruits.append(GoodFruit(pos, self.cell_size))
 
     def _generate_bad_fruit(self):
-        # Verifier qu'il n'y a rien d'autre sur la case
-        x = random.randint(0, self.ncolumns - 1)
-        y = random.randint(0, self.nrows - 1)
+        available = False
+        while available is False:
+            x = random.randint(0, self.ncolumns - 1)
+            y = random.randint(0, self.nrows - 1)
+            pos = Vector2(x, y)
+            available = self._check_tile_empty(pos)
+
         self.bad_fruits.append(BadFruit(Vector2(x, y), self.cell_size))
+
+    def _check_tile_empty(self, pos: Vector2):
+        empty = True
+        for f in self.good_fruits:
+            empty = empty and f.check_available(pos)
+        for f in self.bad_fruits:
+            empty = empty and f.check_available(pos)
+        empty = empty and self.snake.check_available(pos)
+
+        return empty
+    
+    def change_snake_direction(self, new_dir: Directions):
+        self.snake.dir = new_dir
+
+    def update(self):
+        snake_next_pos = self.snake.head + self.snake.dir.value
+        tile = None
+        for f in self.good_fruits:
+            if not f.check_available(snake_next_pos):
+                tile = type(f)
+                self.good_fruits.remove(f)
+
+        for f in self.bad_fruits:
+            if not f.check_available(snake_next_pos):
+                tile = type(f)
+                self.bad_fruits.remove(f)
+
+        if not self.snake.move(tile):
+            pass  # Game over
+
+        if tile is GoodFruit:
+            self._generate_good_fruit()
+        if tile is BadFruit:
+            self._generate_bad_fruit()
 
     def draw(self, display):
         for f in self.good_fruits:
