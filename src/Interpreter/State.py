@@ -21,15 +21,17 @@ class State:
                  snake_body: list[Directions]):
 
         self._head = snake_head
-        self._get_walls(nrows, ncolumns)
+        self._nrows = nrows
+        self._ncolumns = ncolumns
+        self._get_walls()
         self._get_fruits(good_fruits, bad_fruits)
         self._get_snake(snake_body)
 
-    def _get_walls(self, nrows: int, ncolumns: int):
+    def _get_walls(self):
         self.up = ['0'] * int(self._head.y) + ['W']
-        self.down = ['0'] * int(nrows - 1 - self._head.y) + ['W']
+        self.down = ['0'] * int(self._nrows - 1 - self._head.y) + ['W']
         self.left = ['0'] * int(self._head.x) + ['W']
-        self.right = ['0'] * int(ncolumns - 1 - self._head.x) + ['W']
+        self.right = ['0'] * int(self._ncolumns - 1 - self._head.x) + ['W']
 
     def _get_fruits(self, good_fruits: list[Fruit], bad_fruits: list[Fruit]):
         for f in bad_fruits:
@@ -99,7 +101,22 @@ class State:
                     self.left[(col_diff + 1) * -1]
 
     def display(self):
-        print(f'Up: {self.up}')
-        print(f'Down: {self.down}')
-        print(f'Left: {self.left}')
-        print(f'Right: {self.right}')
+        string = ""
+        for c in reversed(self.up):
+            string += ' ' * (int(self._head.x) + 1)
+            string += c
+            string += '\n'
+
+        for c in reversed(self.left):
+            string += c
+        string += 'H'
+        for c in self.right:
+            string += c
+        string += '\n'
+
+        for c in self.down:
+            string += ' ' * (int(self._head.x) + 1)
+            string += c
+            string += '\n'
+
+        print(string)
