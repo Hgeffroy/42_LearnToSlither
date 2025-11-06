@@ -1,9 +1,11 @@
 import pygame
+from pygame import Surface
 from pygame.math import Vector2
+
 import random
 
-from classes.utils import Directions as D
-from classes.Fruit import GoodFruit, BadFruit
+from Game.utils import Directions as D
+from Game.utils import Tile as T
 
 
 class Snake:
@@ -28,7 +30,7 @@ class Snake:
 
         self.dir = self.body[0]
 
-    def move(self, tile_type: type | None, max_x, max_y):
+    def move(self, tile_type: T, max_x: int, max_y: int):
         if not self.check_available(self.head + self.dir.value):
             return False
 
@@ -39,17 +41,17 @@ class Snake:
                 or self.head.y < 0 or self.head.y > max_y):
             return False
 
-        if tile_type is not GoodFruit:
+        if tile_type is not T.GOOD_FRUIT:
             self.body.pop()
 
-        if tile_type is BadFruit:
+        if tile_type is T.BAD_FRUIT:
             if len(self.body) == 0:
                 return False
             self.body.pop()
 
         return True
 
-    def draw(self, display):
+    def draw(self, display: Surface):
         pos_to_draw = self.head.copy()
         rect = pygame.Rect(pos_to_draw.x * self.cell_size,
                            pos_to_draw.y * self.cell_size,
@@ -67,13 +69,17 @@ class Snake:
     def check_available(self, pos_to_check: Vector2):
         pos_snake = self.head.copy()
         if pos_snake == pos_to_check:
-            print('touching snake')
             return False
 
         for dir in self.body:
             pos_snake += dir.opposite().value
             if pos_snake == pos_to_check:
-                print('touching snake')
                 return False
 
         return True
+
+    def debug_display(self):
+        print(f'Pos x: {self.head.x}')
+        print(f'Pos y: {self.head.y}')
+        print(f'Direction: {self.dir}')
+        print(f'Body: {self.body}')

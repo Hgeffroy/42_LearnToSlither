@@ -1,10 +1,12 @@
 import random
-import pygame
+
+from pygame import Surface
 from pygame.math import Vector2
 
-from classes.Snake import Snake
-from classes.Fruit import GoodFruit, BadFruit
-from classes.utils import Directions as D
+from Game.Snake import Snake
+from Game.Fruit import GoodFruit, BadFruit
+from Game.utils import Directions as D
+from Game.utils import Tile as T
 
 
 class Board:
@@ -12,11 +14,11 @@ class Board:
     bad_fruits: list[BadFruit] = []
 
     def __init__(self,
-                 cell_size=40,
-                 nrows=10,
-                 ncolumns=10,
-                 nb_good_fruits=2,
-                 nb_bad_fruits=1):
+                 cell_size: int = 40,
+                 nrows: int = 10,
+                 ncolumns: int = 10,
+                 nb_good_fruits: int = 2,
+                 nb_bad_fruits: int = 1):
 
         self.cell_size = cell_size
         self.nrows = nrows
@@ -63,52 +65,47 @@ class Board:
 
         return empty
 
-    def on_event_keypressed(self, event):
-        match event.key:
-            case pygame.K_UP:
-                new_dir = D.UP
-                if self.snake.dir != new_dir.opposite():
-                    self.snake.dir = new_dir
-            case pygame.K_DOWN:
-                new_dir = D.DOWN
-                if self.snake.dir != new_dir.opposite():
-                    self.snake.dir = new_dir
-            case pygame.K_LEFT:
-                new_dir = D.LEFT
-                if self.snake.dir != new_dir.opposite():
-                    self.snake.dir = new_dir
-            case pygame.K_RIGHT:
-                new_dir = D.RIGHT
-                if self.snake.dir != new_dir.opposite():
-                    self.snake.dir = new_dir
+    def on_event_keypressed(self, dir: D):
+        if self.snake.dir != dir.opposite():
+            self.snake.dir = dir
 
     def update(self):
         snake_next_pos = self.snake.head + self.snake.dir.value
 
-        tile = None
+        tile = T.IDLE
         for f in self.good_fruits:
             if not f.check_available(snake_next_pos):
-                tile = type(f)
+                tile = T.GOOD_FRUIT
                 self.good_fruits.remove(f)
 
         for f in self.bad_fruits:
             if not f.check_available(snake_next_pos):
-                tile = type(f)
+                tile = T.BAD_FRUIT
                 self.bad_fruits.remove(f)
 
         if not self.snake.move(tile, self.ncolumns - 1, self.nrows - 1):
-            return False
+            return T.GAME_OVER
 
-        if tile is GoodFruit:
+        if tile is T.GOOD_FRUIT:
             self._generate_good_fruit()
-        if tile is BadFruit:
+        if tile is T.BAD_FRUIT:
             self._generate_bad_fruit()
 
-        return True
+        return tile
 
-    def draw(self, display):
+    def draw(self, display: Surface):
         for f in self.good_fruits:
             f.draw(display)
         for f in self.bad_fruits:
             f.draw(display)
         self.snake.draw(display)
+
+    def debug_display(self):
+        print('Snake')
+        self.snake.debug_display()
+        for f in self.good_fruits:
+            print('Good fruit:')
+            f.debug_display()
+        for f in self.bad_fruits:
+            print('Bad fruit:')
+            f.debug_display()

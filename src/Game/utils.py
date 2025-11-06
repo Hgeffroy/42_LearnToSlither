@@ -17,3 +17,10 @@ class Directions(Enum):
             return Directions.RIGHT
         if self is Directions.RIGHT:
             return Directions.LEFT
+
+
+class Tile(Enum):
+    IDLE = 1,
+    GOOD_FRUIT = 2,
+    BAD_FRUIT = 3,
+    GAME_OVER = 4,
