@@ -14,6 +14,7 @@ def main():
     q_env_to_interpreter = Queue()
     q_interpreter_to_agent_reward = Queue()
     q_interpreter_to_agent_action = Queue()
+    # test(q_agent_to_env)
 
     process_env = mp.Process(target=launch_environment_for_agent,
                              args=(q_agent_to_env, q_env_to_interpreter))

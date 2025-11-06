@@ -1,6 +1,5 @@
 from pygame.math import Vector2
 
-from Game.Board import Board
 from Game.Snake import Snake
 from Game.Fruit import Fruit
 from Game.utils import Directions
@@ -14,22 +13,23 @@ class State:
     _head: Vector2
 
     def __init__(self,
-                 board: Board,
+                 nrows: int,
+                 ncolumns: int,
                  good_fruits: list[Fruit],
                  bad_fruits: list[Fruit],
-                 snake: Snake,
+                 snake_head: Snake,
                  snake_body: list[Directions]):
 
-        self._head = board.snake.head
-        self._get_walls(board)
+        self._head = snake_head
+        self._get_walls(nrows, ncolumns)
         self._get_fruits(good_fruits, bad_fruits)
         self._get_snake(snake_body)
 
-    def _get_walls(self, board: Board):
+    def _get_walls(self, nrows: int, ncolumns: int):
         self.up = ['0'] * int(self._head.y) + ['W']
-        self.down = ['0'] * int(board.nrows - 1 - self._head.y) + ['W']
+        self.down = ['0'] * int(nrows - 1 - self._head.y) + ['W']
         self.left = ['0'] * int(self._head.x) + ['W']
-        self.right = ['0'] * int(board.ncolumns - 1 - self._head.x) + ['W']
+        self.right = ['0'] * int(ncolumns - 1 - self._head.x) + ['W']
 
     def _get_fruits(self, good_fruits: list[Fruit], bad_fruits: list[Fruit]):
         for f in bad_fruits:
