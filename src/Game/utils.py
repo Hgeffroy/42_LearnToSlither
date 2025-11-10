@@ -20,7 +20,27 @@ class Directions(Enum):
 
 
 class Tile(Enum):
-    IDLE = 1,
-    GOOD_FRUIT = 2,
-    BAD_FRUIT = 3,
-    GAME_OVER = 4,
+    GAME_OVER = 0
+    GOOD_FRUIT = 1
+    BAD_FRUIT = 2
+    IDLE = 3
+
+    def convert_from_char(c: chr):
+        match c:
+            case 'S':
+                return Tile.GAME_OVER
+            case 'W':
+                return Tile.GAME_OVER
+            case 'G':
+                return Tile.GOOD_FRUIT
+            case 'R':
+                return Tile.BAD_FRUIT
+
+        raise Exception(f'Could not convert character {c} into tile')
+
+
+class Action(Enum):
+    UP = 0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3

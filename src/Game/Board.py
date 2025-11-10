@@ -10,8 +10,8 @@ from Game.utils import Tile as T
 
 
 class Board:
-    good_fruits: list[GoodFruit] = []
-    bad_fruits: list[BadFruit] = []
+    good_fruits: list[GoodFruit]
+    bad_fruits: list[BadFruit]
 
     def __init__(self,
                  cell_size: int = 40,
@@ -25,6 +25,9 @@ class Board:
         self.ncolumns = ncolumns
         self.nb_good_fruits = nb_good_fruits
         self.nb_bad_fruits = nb_bad_fruits
+        self.good_fruits = []
+        self.bad_fruits = []
+        self.best_score = 0
 
         snake_x = random.randint(2, self.ncolumns - 3)
         snake_y = random.randint(2, self.nrows - 3)
@@ -66,8 +69,7 @@ class Board:
         return empty
 
     def on_event_keypressed(self, dir: D):
-        if self.snake.dir != dir.opposite():
-            self.snake.dir = dir
+        self.snake.dir = dir
 
     def update(self):
         snake_next_pos = self.snake.head + self.snake.dir.value
@@ -84,6 +86,10 @@ class Board:
                 self.bad_fruits.remove(f)
 
         if not self.snake.move(tile, self.ncolumns - 1, self.nrows - 1):
+            score = len(self.snake.body) + 1
+            if score > self.best_score:
+                self.best_score = score
+            print(f'Best score: {self.best_score}')
             return T.GAME_OVER
 
         if tile is T.GOOD_FRUIT:

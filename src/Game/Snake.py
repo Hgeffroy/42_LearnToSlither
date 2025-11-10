@@ -9,7 +9,7 @@ from Game.utils import Tile as T
 
 
 class Snake:
-    body: list[D] = []
+    body: list[D]
 
     # Need to be init at least 2 away from border
     def __init__(self,
@@ -20,6 +20,7 @@ class Snake:
         self.head = pos
         self.cell_size = cell_size
         self.size = size
+        self.body = []
 
         for _ in range(self.size):
             possible_dir = [d for d in D]
