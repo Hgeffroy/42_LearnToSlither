@@ -7,6 +7,7 @@ class StatsDrawer:
 
         fig, ax = plt.subplots()
         self.line, = ax.plot([], [], lw=2)
+        ax.axhline(y=10, color='r', linestyle='--', linewidth=2)
         ax.set_ylim(0, 50)
         ax.set_xlabel('Time')
         ax.set_ylabel('Score')

@@ -1,6 +1,5 @@
 import sys
 import time
-from threading import Thread
 from multiprocessing import Queue
 
 import pygame
