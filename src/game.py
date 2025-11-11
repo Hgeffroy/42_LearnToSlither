@@ -1,5 +1,6 @@
 import sys
 import time
+from threading import Thread
 from multiprocessing import Queue
 
 import pygame
@@ -10,6 +11,7 @@ from Game.Board import Board
 from Game.utils import Directions as D
 from Game.utils import Tile as T
 from Game.utils import Action as A
+from Game.StatsDrawer import StatsDrawer
 
 FPS = 60
 FramePerSec = pygame.time.Clock()
@@ -63,6 +65,7 @@ def launch_game_standalone(display: Surface, board: Board):
 
 def launch_game_for_agent(display: Surface,
                           board: Board,
+                          stats_drawer: StatsDrawer,
                           q_from_agent: Queue,
                           q_to_interpreter: Queue):
 
@@ -119,6 +122,7 @@ def launch_game_for_agent(display: Surface,
                               last_tile))
 
         if last_tile is T.GAME_OVER:
+            stats_drawer.update(score=len(board.snake.body))
             print('Game Over')
             print(f'Score: {len(board.snake.body)}')
             break
@@ -138,10 +142,15 @@ def launch_environment_standalone():
 
 def launch_environment_for_agent(q_from_agent: Queue, q_to_interpreter: Queue):
     display = init_window()
+    stats_drawer = StatsDrawer()
+
     while True:
         board = Board()
-        launch_game_for_agent(display, board, q_from_agent, q_to_interpreter)
-        del board
+        launch_game_for_agent(display,
+                              board,
+                              stats_drawer,
+                              q_from_agent,
+                              q_to_interpreter)
 
 
 if __name__ == "__main__":

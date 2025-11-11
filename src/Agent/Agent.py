@@ -13,10 +13,8 @@ class Agent:
     _previous_state: list[int]
     _action: Action
     _nb_games: int
-    training_mode: bool
 
-    def __init__(self, training_mode):
-        self.training_mode = training_mode
+    def __init__(self):
         self._nb_games = 0
         self._state = []
 
@@ -89,9 +87,9 @@ class Agent:
 class Agent_QTable(Agent):
     _table: QTable
 
-    def __init__(self, training_mode):
-        super().__init__(training_mode)
-        self._table = QTable(0.9, 0.1)
+    def __init__(self):
+        super().__init__()
+        self._table = QTable(0.9, 0.1, True)
 
     def train_step(self, reward: Reward):
         if reward is Reward.GAME_OVER:
@@ -101,10 +99,11 @@ class Agent_QTable(Agent):
                                  self._state,
                                  self._action,
                                  reward)
+        self._table.store()
 
     def next_step(self):
-        # epsilon = 160 - self._nb_games
-        # if random.randint(0, 400) < epsilon:
+        # epsilon = 320 - self._nb_games
+        # if random.randint(0, 800) < epsilon:
         #     rd = random.randint(0, 3)
         #     self._action = Action(rd)
         # else:

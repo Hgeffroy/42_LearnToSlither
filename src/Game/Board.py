@@ -27,7 +27,6 @@ class Board:
         self.nb_bad_fruits = nb_bad_fruits
         self.good_fruits = []
         self.bad_fruits = []
-        self.best_score = 0
 
         snake_x = random.randint(2, self.ncolumns - 3)
         snake_y = random.randint(2, self.nrows - 3)
@@ -86,10 +85,6 @@ class Board:
                 self.bad_fruits.remove(f)
 
         if not self.snake.move(tile, self.ncolumns - 1, self.nrows - 1):
-            score = len(self.snake.body) + 1
-            if score > self.best_score:
-                self.best_score = score
-            print(f'Best score: {self.best_score}')
             return T.GAME_OVER
 
         if tile is T.GOOD_FRUIT:

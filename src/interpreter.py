@@ -7,7 +7,7 @@ from Interpreter.Rewarder import Rewarder
 def launch_interpreter_for_agent(q_from_game: Queue,
                                  q_to_agent_reward: Queue,
                                  q_to_agent_state: Queue):
-    
+
     rewarder = Rewarder()
 
     while True:
