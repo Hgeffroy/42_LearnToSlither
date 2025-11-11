@@ -44,3 +44,11 @@ class Action(Enum):
     DOWN = 1
     LEFT = 2
     RIGHT = 3
+
+
+class Reward(Enum):
+    GAME_OVER = -10
+    BAD_FRUIT = -5
+    IDLE = -1
+    GOOD_DIR = 5
+    GOOD_FRUIT = 10

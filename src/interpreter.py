@@ -1,20 +1,14 @@
 from multiprocessing import Queue
 
 from Interpreter.State import State
-from Game.utils import Tile as T
-
-
-REWARD = {
-    T.GAME_OVER: -10,
-    T.BAD_FRUIT: -3,
-    T.IDLE: 1,
-    T.GOOD_FRUIT: 3
-}
+from Interpreter.Rewarder import Rewarder
 
 
 def launch_interpreter_for_agent(q_from_game: Queue,
                                  q_to_agent_reward: Queue,
                                  q_to_agent_state: Queue):
+    
+    rewarder = Rewarder()
 
     while True:
         (nrows,
@@ -23,6 +17,7 @@ def launch_interpreter_for_agent(q_from_game: Queue,
          bad_fruits,
          snake_head,
          snake_body,
+         last_move,
          last_tile) = q_from_game.get()
 
         state = State(nrows,
@@ -32,13 +27,14 @@ def launch_interpreter_for_agent(q_from_game: Queue,
                       snake_head,
                       snake_body)
 
-        state.display()
+        # state.display()
         q_to_agent_state.put((state.up, state.down, state.left, state.right))
 
-        if last_tile is None:
+        if last_move is None:
             q_to_agent_reward.put(None)
         else:
-            q_to_agent_reward.put(REWARD[last_tile])
+            reward = rewarder.compute_reward(state, last_tile, last_move)
+            q_to_agent_reward.put(reward)
 
 
 def launch_interpreter_standalone():

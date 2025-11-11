@@ -73,6 +73,7 @@ def launch_game_for_agent(display: Surface,
                           board.bad_fruits,
                           board.snake.head,
                           board.snake.body,
+                          None,
                           None))
 
     display.fill(pygame.Color('black'))
@@ -106,9 +107,6 @@ def launch_game_for_agent(display: Surface,
                 board.on_event_keypressed(D.RIGHT)
 
         last_tile = board.update()
-        if last_tile is T.GAME_OVER:
-            print('Game Over')
-            break
 
         # Send to interpreter board + last
         q_to_interpreter.put((board.nrows,
@@ -117,7 +115,13 @@ def launch_game_for_agent(display: Surface,
                               board.bad_fruits,
                               board.snake.head,
                               board.snake.body,
+                              move,
                               last_tile))
+
+        if last_tile is T.GAME_OVER:
+            print('Game Over')
+            print(f'Score: {len(board.snake.body)}')
+            break
 
         display.fill(pygame.Color('black'))
         board.draw(display)

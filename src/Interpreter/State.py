@@ -98,7 +98,7 @@ class State:
                 elif col_diff > 0:
                     self.right[col_diff - 1] = 'S'
                 else:
-                    self.left[(col_diff + 1) * -1]
+                    self.left[(col_diff + 1) * -1] = 'S'
 
     def display(self):
         string = ""
