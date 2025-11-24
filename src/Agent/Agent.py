@@ -2,7 +2,7 @@ from Game.utils import Action, Reward
 from Agent.QTable import QTable
 
 import abc
-# import random
+import random
 
 
 # State:
@@ -12,10 +12,10 @@ class Agent:
     _state: list[bool]
     _previous_state: list[int]
     _action: Action
-    _nb_games: int
+    nb_games: int
 
     def __init__(self):
-        self._nb_games = 0
+        self.nb_games = 0
         self._state = []
 
     def import_state(self,
@@ -86,29 +86,30 @@ class Agent:
 
 class Agent_QTable(Agent):
     _table: QTable
+    _model_path: str
 
-    def __init__(self):
+    def __init__(self, model_path: str):
         super().__init__()
-        self._table = QTable(0.9, 0.1, True)
+        self._table = QTable(0.9, 0.1, model_path)
+        self._model_path = model_path
 
     def train_step(self, reward: Reward):
-        if reward is Reward.GAME_OVER:
-            self._nb_games += 1
-            print(f'Nb games: {self._nb_games}')
         self._table.update_value(self._previous_state,
                                  self._state,
                                  self._action,
                                  reward)
-        self._table.store()
+        self._table.store(self._model_path)
 
-    def next_step(self):
-        # epsilon = 320 - self._nb_games
-        # if random.randint(0, 800) < epsilon:
-        #     rd = random.randint(0, 3)
-        #     self._action = Action(rd)
-        # else:
-        #     self._action = self._table.get_best_action(self._state)
+    def next_step(self, explore_mode: bool = False):
+        if explore_mode is True:
+            epsilon = 80 - self.nb_games
+            if random.randint(0, 200) < epsilon:
+                rd = random.randint(0, 3)
+                self._action = Action(rd)
+            else:
+                self._action = self._table.get_best_action(self._state)
 
-        self._action = self._table.get_best_action(self._state)
-        # print(f'Going {self._action}')
+        else:
+            self._action = self._table.get_best_action(self._state)
+
         return self._action

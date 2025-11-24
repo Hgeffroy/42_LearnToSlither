@@ -66,7 +66,8 @@ def launch_game_for_agent(display: Surface,
                           board: Board,
                           stats_drawer: StatsDrawer,
                           q_from_agent: Queue,
-                          q_to_interpreter: Queue):
+                          q_to_interpreter: Queue,
+                          training_mode: bool):
 
     # Send to interpreter board + last
     q_to_interpreter.put((board.nrows,
@@ -81,7 +82,10 @@ def launch_game_for_agent(display: Surface,
     display.fill(pygame.Color('black'))
     board.draw(display)
     pygame.display.update()
-    sleep_time = 0.001
+
+    sleep_time = 0
+    if training_mode is False:
+        sleep_time = 0.3
 
     while True:
         time.sleep(sleep_time)
@@ -139,17 +143,31 @@ def launch_environment_standalone():
     launch_game_standalone(display, board)
 
 
-def launch_environment_for_agent(q_from_agent: Queue, q_to_interpreter: Queue):
+def launch_environment_for_agent(q_from_agent: Queue,
+                                 q_to_interpreter: Queue,
+                                 training_mode: bool,
+                                 num_games: int):
+
     display = init_window()
     stats_drawer = StatsDrawer()
 
-    while True:
+    for _ in range(num_games):
         board = Board()
         launch_game_for_agent(display,
                               board,
                               stats_drawer,
                               q_from_agent,
-                              q_to_interpreter)
+                              q_to_interpreter,
+                              training_mode)
+
+    q_to_interpreter.put((None,
+                          None,
+                          None,
+                          None,
+                          None,
+                          None,
+                          None,
+                          None))
 
 
 if __name__ == "__main__":

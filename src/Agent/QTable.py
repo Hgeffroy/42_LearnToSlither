@@ -6,18 +6,17 @@ from Game.utils import Action, Reward
 
 
 class QTable:
-    def __init__(self, gamma: float, lr: float, load: bool):
+    def __init__(self, gamma: float, lr: float, model_path: str):
         self._nb_state = pow(2, 8)
         self._gamma = gamma
         self._lr = lr
 
-        if not load:
+        if os.path.exists(model_path):
+            self.load(model_path)
+        else:
             self._table = [0] * self._nb_state * 4
             for idx in range(len(self._table)):
                 self._table[idx] = random.uniform(-1, 1)
-
-        else:
-            self.load()
 
     def _get_index(self, state: list[bool], action: Action):
         idx = action.value * self._nb_state
@@ -67,19 +66,16 @@ class QTable:
         # print(f'New value for new state after {last_action}')
         # self.get_max_val_for_state(state)
 
-    def store(self, model_folder: str = './models'):
-        if not os.path.exists(model_folder):
-            os.makedirs(model_folder)
+    def store(self, model_path: str):
+        dir = os.path.dirname(model_path)
+        if not os.path.exists(dir):
+            os.makedirs(dir)
 
-        path = os.path.join(model_folder, 'model.csv')
-
-        with open(path, 'w', newline='') as csvfile:
+        with open(model_path, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile, delimiter=';')
             writer.writerow(self._table)
 
-    def load(self, model_folder: str = './models'):
-        path = os.path.join(model_folder, 'model.csv')
-
-        with open(path, 'r', newline='') as csvfile:
+    def load(self, model_path: str):
+        with open(model_path, 'r', newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=';')
             self._table = list(map(float, next(reader)))
