@@ -22,7 +22,6 @@ def launch_interpreter_for_agent(q_from_game: Queue,
 
         if nrows is None:
             q_to_agent_state.put((None, None, None, None))
-            print(q_to_agent_state)
             break
 
         state = State(nrows,

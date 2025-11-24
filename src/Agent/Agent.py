@@ -102,7 +102,7 @@ class Agent_QTable(Agent):
 
     def next_step(self, explore_mode: bool = False):
         if explore_mode is True:
-            epsilon = 80 - self.nb_games
+            epsilon = max(2, 80 - self.nb_games)
             if random.randint(0, 200) < epsilon:
                 rd = random.randint(0, 3)
                 self._action = Action(rd)

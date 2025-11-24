@@ -16,7 +16,7 @@ class QTable:
         else:
             self._table = [0] * self._nb_state * 4
             for idx in range(len(self._table)):
-                self._table[idx] = random.uniform(-1, 1)
+                self._table[idx] = random.uniform(-0.1, 0.1)
 
     def _get_index(self, state: list[bool], action: Action):
         idx = action.value * self._nb_state
