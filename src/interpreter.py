@@ -31,7 +31,7 @@ def launch_interpreter_for_agent(q_from_game: Queue,
                       snake_head,
                       snake_body)
 
-        # state.display()
+        state.display()
         q_to_agent_state.put((state.up, state.down, state.left, state.right))
 
         if last_move is None:

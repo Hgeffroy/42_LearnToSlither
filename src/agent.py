@@ -30,7 +30,9 @@ def launch_agent_QTable(q_from_interpreter_state: Queue,
             agent.train_step(reward)
 
         if reward is not R.GAME_OVER:
-            q_to_game.put(agent.next_step(explore_mode))
+            next_step = agent.next_step(explore_mode)
+            print(next_step)
+            q_to_game.put(next_step)
 
         else:
             agent.nb_games += 1
