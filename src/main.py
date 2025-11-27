@@ -9,6 +9,7 @@ from agent import launch_agent_QTable
 
 def main(training_mode: bool,
          explore_mode: bool,
+         step_mode: bool,
          num_games: int,
          model_path: str):
 
@@ -21,6 +22,7 @@ def main(training_mode: bool,
                              args=(q_agent_to_env,
                                    q_env_to_interpreter,
                                    training_mode,
+                                   step_mode,
                                    num_games))
 
     process_interpreter = mp.Process(target=launch_interpreter_for_agent,
@@ -71,6 +73,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="./models/model.csv",
         help="The model you want to use."
     )
+    parser.add_argument(
+        "-s", "--step",
+        type=bool,
+        default=False,
+        help="Step by step on/off."
+    )
 
     return parser
 
@@ -78,4 +86,4 @@ def build_parser() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     args = build_parser().parse_args()
 
-    main(args.training, args.explore, args.num_games, args.model)
+    main(args.training, args.explore, args.step, args.num_games, args.model)

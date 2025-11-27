@@ -62,6 +62,78 @@ def launch_game_standalone(display: Surface, board: Board):
         FramePerSec.tick(FPS)
 
 
+def launch_game_for_agent_step(display: Surface,
+                               board: Board,
+                               stats_drawer: StatsDrawer,
+                               q_from_agent: Queue,
+                               q_to_interpreter: Queue,
+                               training_mode: bool):
+
+    # Send to interpreter board + last
+    q_to_interpreter.put((board.nrows,
+                          board.ncolumns,
+                          board.good_fruits,
+                          board.bad_fruits,
+                          board.snake.head,
+                          board.snake.body,
+                          None,
+                          None))
+
+    display.fill(pygame.Color('black'))
+    board.draw(display)
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                q_to_interpreter.put((None,
+                                      None,
+                                      None,
+                                      None,
+                                      None,
+                                      None,
+                                      None,
+                                      None))
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN:
+                move = q_from_agent.get()
+                match move:
+                    case A.UP:
+                        board.on_event_keypressed(D.UP)
+                    case A.DOWN:
+                        board.on_event_keypressed(D.DOWN)
+                    case A.LEFT:
+                        board.on_event_keypressed(D.LEFT)
+                    case A.RIGHT:
+                        board.on_event_keypressed(D.RIGHT)
+
+                last_tile = board.update()
+
+                # Send to interpreter board + last
+                q_to_interpreter.put((board.nrows,
+                                      board.ncolumns,
+                                      board.good_fruits,
+                                      board.bad_fruits,
+                                      board.snake.head,
+                                      board.snake.body,
+                                      move,
+                                      last_tile))
+
+                if last_tile is T.GAME_OVER:
+                    stats_drawer.update(score=len(board.snake.body))
+                    print('Game Over')
+                    print(f'Score: {len(board.snake.body)}')
+                    return
+
+        display.fill(pygame.Color('black'))
+        board.draw(display)
+
+        pygame.display.update()
+        FramePerSec.tick(FPS)
+
+
 def launch_game_for_agent(display: Surface,
                           board: Board,
                           stats_drawer: StatsDrawer,
@@ -102,13 +174,6 @@ def launch_game_for_agent(display: Surface,
                 pygame.quit()
                 sys.exit()
 
-            if event.type == pygame.KEYDOWN:
-                match event.key:
-                    case pygame.K_UP:
-                        sleep_time = sleep_time / 10000
-                    case pygame.K_DOWN:
-                        sleep_time = sleep_time * 10000
-
         move = q_from_agent.get()
         match move:
             case A.UP:
@@ -136,7 +201,7 @@ def launch_game_for_agent(display: Surface,
             stats_drawer.update(score=len(board.snake.body))
             print('Game Over')
             print(f'Score: {len(board.snake.body)}')
-            break
+            return
 
         display.fill(pygame.Color('black'))
         board.draw(display)
@@ -154,19 +219,25 @@ def launch_environment_standalone():
 def launch_environment_for_agent(q_from_agent: Queue,
                                  q_to_interpreter: Queue,
                                  training_mode: bool,
+                                 step_mode: bool,
                                  num_games: int):
 
     display = init_window()
     stats_drawer = StatsDrawer()
 
+    if step_mode is True:
+        game_func = launch_game_for_agent_step
+    else:
+        game_func = launch_game_for_agent
+
     for _ in range(num_games):
         board = Board()
-        launch_game_for_agent(display,
-                              board,
-                              stats_drawer,
-                              q_from_agent,
-                              q_to_interpreter,
-                              training_mode)
+        game_func(display,
+                  board,
+                  stats_drawer,
+                  q_from_agent,
+                  q_to_interpreter,
+                  training_mode)
 
     q_to_interpreter.put((None,
                           None,
