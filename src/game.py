@@ -91,6 +91,14 @@ def launch_game_for_agent(display: Surface,
         time.sleep(sleep_time)
         for event in pygame.event.get():
             if event.type == QUIT:
+                q_to_interpreter.put((None,
+                                      None,
+                                      None,
+                                      None,
+                                      None,
+                                      None,
+                                      None,
+                                      None))
                 pygame.quit()
                 sys.exit()
 
@@ -168,6 +176,9 @@ def launch_environment_for_agent(q_from_agent: Queue,
                           None,
                           None,
                           None))
+
+    pygame.quit()
+    sys.exit()
 
 
 if __name__ == "__main__":
