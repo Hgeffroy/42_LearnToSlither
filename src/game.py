@@ -235,7 +235,7 @@ def launch_environment_for_agent(q_from_agent: Queue,
         board = Board(cell_size=CELL_SIZE,
                       nrows=board_size,
                       ncolumns=board_size)
-        
+
         game_func(display,
                   board,
                   stats_drawer,
