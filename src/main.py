@@ -11,6 +11,7 @@ def main(training_mode: bool,
          explore_mode: bool,
          step_mode: bool,
          num_games: int,
+         board_size: int,
          model_path: str):
 
     q_agent_to_env = Queue()
@@ -23,7 +24,8 @@ def main(training_mode: bool,
                                    q_env_to_interpreter,
                                    training_mode,
                                    step_mode,
-                                   num_games))
+                                   num_games,
+                                   board_size))
 
     process_interpreter = mp.Process(target=launch_interpreter_for_agent,
                                      args=(q_env_to_interpreter,
@@ -62,22 +64,28 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exploratory mode on/off."
     )
     parser.add_argument(
+        "-s", "--step",
+        type=bool,
+        default=False,
+        help="Step by step on/off."
+    )
+    parser.add_argument(
         "-n", "--num-games",
         type=int,
         default=10,
         help="The number of games you want to play."
     )
     parser.add_argument(
+        "-sz", "--size",
+        type=int,
+        default=10,
+        help="Size of the board."
+    )
+    parser.add_argument(
         "-m", "--model",
         type=str,
         default="./models/model.csv",
         help="The model you want to use."
-    )
-    parser.add_argument(
-        "-s", "--step",
-        type=bool,
-        default=False,
-        help="Step by step on/off."
     )
 
     return parser
@@ -86,4 +94,9 @@ def build_parser() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     args = build_parser().parse_args()
 
-    main(args.training, args.explore, args.step, args.num_games, args.model)
+    main(args.training,
+         args.explore,
+         args.step,
+         args.num_games,
+         args.size,
+         args.model)

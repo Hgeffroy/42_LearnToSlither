@@ -16,17 +16,17 @@ FPS = 60
 FramePerSec = pygame.time.Clock()
 
 # Screen information
-SCREEN_WIDTH = 400
-SCREEN_HEIGHT = 400
+CELL_SIZE = 40
 
 # Screen update event
 SCREEN_UPDATE = pygame.USEREVENT
 
 
-def init_window():
+def init_window(board_size: int = 10):
     pygame.init()
 
-    display = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen_size = CELL_SIZE * board_size
+    display = pygame.display.set_mode((screen_size, screen_size))
     pygame.display.set_caption("LearnToSlither")
     pygame.time.set_timer(SCREEN_UPDATE, 300)
 
@@ -220,9 +220,10 @@ def launch_environment_for_agent(q_from_agent: Queue,
                                  q_to_interpreter: Queue,
                                  training_mode: bool,
                                  step_mode: bool,
-                                 num_games: int):
+                                 num_games: int,
+                                 board_size: int):
 
-    display = init_window()
+    display = init_window(board_size)
     stats_drawer = StatsDrawer()
 
     if step_mode is True:
@@ -231,7 +232,10 @@ def launch_environment_for_agent(q_from_agent: Queue,
         game_func = launch_game_for_agent
 
     for _ in range(num_games):
-        board = Board()
+        board = Board(cell_size=CELL_SIZE,
+                      nrows=board_size,
+                      ncolumns=board_size)
+        
         game_func(display,
                   board,
                   stats_drawer,
